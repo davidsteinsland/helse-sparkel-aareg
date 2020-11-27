@@ -1,7 +1,7 @@
 val junitJupiterVersion = "5.6.2"
 
 plugins {
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.0"
 }
 
 buildscript {
@@ -18,32 +18,30 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:fa839faa1c")
+    implementation("io.arrow-kt:arrow-core-data:0.11.0")
+    implementation("com.github.navikt:rapids-and-rivers:9ea2f5e")
+    implementation("no.nav.tjenestespesifikasjoner:arbeidsforholdv3-tjenestespesifikasjon:1.2019.01.16-21.19-afc54bed6f85")
 
     testImplementation("io.mockk:mockk:1.10.0")
-    testImplementation("com.github.tomakehurst:wiremock:2.27.1") {
-        exclude(group = "junit")
-    }
-    testImplementation("no.nav:kafka-embedded-env:2.4.0")
-    testImplementation("org.awaitility:awaitility:4.0.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
 
 tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "12"
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "14"
     }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "12"
+
+    named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
+        kotlinOptions.jvmTarget = "14"
     }
 
     named<Jar>("jar") {
         archiveBaseName.set("app")
 
         manifest {
-            attributes["Main-Class"] = "no.nav.helse.sparkel.institusjonsopphold.AppKt"
+            attributes["Main-Class"] = "no.nav.helse.sparkel.aareg.AppKt"
             attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
                 it.name
             }
@@ -66,6 +64,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.5.1"
+        gradleVersion = "6.7"
     }
 }
