@@ -43,8 +43,8 @@ spec:
     value: sparkel-aareg-v1
   - name: KAFKA_RAPID_TOPIC
     value: helse-rapid-v1
-  - name: STS_BASE_URL
-    value: http://security-token-service.default.svc.nais.local
+  - name: STS_BASE_SOAP_URL
+    value: https://sts.adeo.no/SecurityTokenServiceProvider/
   - name: KODEVERK_BASE_URL
     value: http://kodeverk.default.svc.nais.local
   - name: AAREG_BASE_URL

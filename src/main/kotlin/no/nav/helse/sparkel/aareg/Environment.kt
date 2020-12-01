@@ -16,7 +16,7 @@ fun readServiceUserCredentials() = ServiceUser(
 fun setUpEnvironment() =
     Environment(
         raw = System.getenv(),
-        stsSoapBaseUrl = System.getenv("STS_URL"),
+        stsSoapBaseUrl = System.getenv("STS_BASE_SOAP_URL"),
         egenAnsattBaseUrl = System.getenv("EGENANSATT_URL")
             ?: error("Mangler env var EGENANSATT_URL"),
         organisasjonBaseUrl = System.getenv("ORGANISASJON_BASE_URL")
