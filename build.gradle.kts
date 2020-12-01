@@ -35,6 +35,9 @@ dependencies {
     implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-ws-policy:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
+    implementation("javax.activation:activation:1.1.1")
 
     testImplementation("io.mockk:mockk:1.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
