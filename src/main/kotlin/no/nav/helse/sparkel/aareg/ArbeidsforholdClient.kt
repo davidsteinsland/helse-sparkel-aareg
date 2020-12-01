@@ -1,28 +1,43 @@
 package no.nav.helse.sparkel.aareg
 
-import arrow.core.Either
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.binding.ArbeidsforholdV3
-import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.Arbeidsforhold
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.NorskIdent
+import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.Organisasjon
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.Periode
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.Regelverker
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.meldinger.FinnArbeidsforholdPrArbeidstakerRequest
 import java.time.LocalDate
 import java.time.ZoneOffset
-import java.util.GregorianCalendar
+import java.util.*
+import javax.xml.datatype.DatatypeConstants
 import javax.xml.datatype.DatatypeFactory
+import javax.xml.datatype.XMLGregorianCalendar
 
-class AaregClient(private val arbeidsforholdV3: ArbeidsforholdV3) {
-    suspend fun finnArbeidsforhold(
+class ArbeidsforholdClient(
+    private val arbeidsforholdV3: ArbeidsforholdV3,
+    private val kodeverkClient: KodeverkClient
+) {
+    fun finnArbeidsforhold(
+        organisasjonsnummer: String,
         aktørId: String,
         fom: LocalDate,
-        tom: LocalDate
-    ): Either<Throwable, List<Arbeidsforhold>> = Either.catch {
+        tom: LocalDate,
+    ): List<ArbeidsforholdDto> =
         arbeidsforholdV3.finnArbeidsforholdPrArbeidstaker(
             hentArbeidsforholdRequest(aktørId, fom, tom)
-        ).arbeidsforhold.toList()
-    }
-
+        )
+            .arbeidsforhold
+            .toList()
+            .filter { it.arbeidsgiver is Organisasjon && (it.arbeidsgiver as Organisasjon).orgnummer == organisasjonsnummer }
+            .flatMap { it.arbeidsavtale }
+            .map {
+                ArbeidsforholdDto(
+                    startdato = it.fomGyldighetsperiode.toLocalDate(),
+                    sluttdato = it.tomGyldighetsperiode.toLocalDate(),
+                    stillingsprosent = it.stillingsprosent.toInt(),
+                    stillingstittel = kodeverkClient.getYrke(it.yrke.kodeverksRef),
+                )
+            }
 
     private fun hentArbeidsforholdRequest(aktørId: String, fom: LocalDate, tom: LocalDate) =
         FinnArbeidsforholdPrArbeidstakerRequest().apply {
@@ -34,8 +49,8 @@ class AaregClient(private val arbeidsforholdV3: ArbeidsforholdV3) {
                 this.tom = tom.toXmlGregorianCalendar()
             }
             rapportertSomRegelverk = Regelverker().apply {
-                value = RegelverkerValues.A_ORDNINGEN.name
-                kodeRef = RegelverkerValues.A_ORDNINGEN.name
+                value = "A_ORDNINGEN"
+                kodeRef = "A_ORDNINGEN"
             }
         }
 
@@ -46,7 +61,6 @@ class AaregClient(private val arbeidsforholdV3: ArbeidsforholdV3) {
         datatypeFactory.newXMLGregorianCalendar(gcal)
     }
 
-    private enum class RegelverkerValues {
-        FOER_A_ORDNINGEN, A_ORDNINGEN, ALLE
-    }
+    private fun XMLGregorianCalendar.toLocalDate() =
+        LocalDate.of(year, month, if (day == DatatypeConstants.FIELD_UNDEFINED) 1 else day)
 }
