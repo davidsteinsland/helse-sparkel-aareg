@@ -4,21 +4,36 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.application.*
-import io.ktor.client.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.jackson.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.client.HttpClient
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.features.CallId
+import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.callIdMdc
+import io.ktor.http.ContentType
+import io.ktor.jackson.JacksonConverter
+import io.ktor.request.path
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.routing.get
+import io.ktor.routing.routing
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.binding.ArbeidsforholdV3
+import no.nav.tjeneste.virksomhet.organisasjon.v5.binding.OrganisasjonV5
+import org.apache.cxf.ext.logging.LoggingFeature
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean
+import org.apache.cxf.ws.addressing.WSAddressingFeature
+import org.apache.cxf.ws.security.trust.STSClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
-import java.util.*
+import java.time.LocalDate
+import java.util.UUID
+import javax.xml.namespace.QName
 
 val httpTraceLog: Logger = LoggerFactory.getLogger("tjenestekall")
 
@@ -28,30 +43,27 @@ val objectMapper: ObjectMapper = jacksonObjectMapper()
 
 fun main() {
     val environment = setUpEnvironment()
-    val app = createApp(environment)
+    val serviceUser = readServiceUserCredentials()
+    val app = createApp(environment, serviceUser)
     app.start()
 }
 
-internal fun createApp(environment: Environment): RapidsConnection {
-    val stsClientWs = stsClient(env.securityTokenServiceEndpointUrl,
-        env.securityTokenUsername to env.securityTokenPassword)
+internal fun createApp(environment: Environment, serviceUser: ServiceUser): RapidsConnection {
+    val stsClientWs = stsClient(environment.stsSoapBaseUrl, serviceUser)
 
-    val stsClientRest = StsRestClient(
-        env.stsRestUrl, env.securityTokenUsername, env.securityTokenPassword)
+    val organisasjonV5 = setupOrganisasjonV5(environment.organisasjonBaseUrl, stsClientWs)
+    val arbeidsforholdV3 = setupArbeidsforholdV3(environment.aaregBaseUrl, stsClientWs)
 
-    val wsClients = WsClients(
-        stsClientWs = stsClientWs,
-        stsClientRest = stsClientRest,
-        callIdGenerator = callIdGenerator::get
-    )
-
-    val arbeidsforholdClient = wsClients.arbeidsforhold(environment.aaregBaseUrl)
-
-    val httpClient = HttpClient()
+    val httpClient = HttpClient {
+        install(JsonFeature) { serializer = JacksonSerializer() }
+    }
     val kodeverkClient = KodeverkClient(httpClient, environment)
-    val arbeidsforholdClient = ArbeidsforholdClient(ArbeidsforholdV3())
-    val organisasjonClient = OrganisasjonClient()
-    val behovløser = Behovløser()
+
+    val arbeidsforholdClient = ArbeidsforholdClient(arbeidsforholdV3, kodeverkClient)
+    val organisasjonClient = OrganisasjonClient(organisasjonV5, kodeverkClient)
+
+    val behovløser = Behovløser(arbeidsforholdClient, organisasjonClient)
+
     return RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(environment.raw)).withKtorModule {
         install(CallId) {
             generate {
@@ -69,8 +81,39 @@ internal fun createApp(environment: Environment): RapidsConnection {
         }
         routing {
             get("/api/test") {
-                call.respond(HttpStatusCode.OK)
+                val behov = call.receive<Behov>()
+                call.respond(behovløser.løsBehov(behov.aktørId, behov.fom, behov.tom, behov.organisasjonsnummer))
             }
         }
     }.build()
 }
+
+data class Behov(
+    val aktørId: String, val fom: LocalDate, val tom: LocalDate, val organisasjonsnummer: String
+)
+
+private val callIdGenerator: ThreadLocal<String> = ThreadLocal.withInitial {
+    UUID.randomUUID().toString()
+}
+
+fun setupOrganisasjonV5(organisasjonBaseUrl: String, stsClientWs: STSClient): OrganisasjonV5 =
+    JaxWsProxyFactoryBean().apply {
+        address = organisasjonBaseUrl
+        wsdlURL = "wsdl/no/nav/tjeneste/virksomhet/organisasjon/v5/Binding.wsdl"
+        serviceName = QName("http://nav.no/tjeneste/virksomhet/organisasjon/v5/Binding", "Organisasjon_v5")
+        endpointName = QName("http://nav.no/tjeneste/virksomhet/organisasjon/v5/Binding", "Organisasjon_v5Port")
+        serviceClass = OrganisasjonV5::class.java
+        this.features.addAll(listOf(WSAddressingFeature(), LoggingFeature()))
+        this.outInterceptors.addAll(listOf(CallIdInterceptor(callIdGenerator::get)))
+    }.create(OrganisasjonV5::class.java).apply { stsClientWs.configureFor(this) }
+
+fun setupArbeidsforholdV3(arbeidsforholdBaseUrl: String, stsClientWs: STSClient): ArbeidsforholdV3 =
+    JaxWsProxyFactoryBean().apply {
+        address = arbeidsforholdBaseUrl
+        wsdlURL = "wsdl/no/nav/tjeneste/virksomhet/arbeidsforhold/v3/Binding.wsdl"
+        serviceName = QName("http://nav.no/tjeneste/virksomhet/arbeidsforhold/v3/Binding", "Arbeidsforhold_v3")
+        endpointName = QName("http://nav.no/tjeneste/virksomhet/arbeidsforhold/v3/Binding", "Arbeidsforhold_v3Port")
+        serviceClass = ArbeidsforholdV3::class.java
+        this.features.addAll(listOf(WSAddressingFeature(), LoggingFeature()))
+        this.outInterceptors.addAll(listOf(CallIdInterceptor(callIdGenerator::get)))
+    }.create(ArbeidsforholdV3::class.java).apply { stsClientWs.configureFor(this) }
