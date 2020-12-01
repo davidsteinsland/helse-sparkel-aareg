@@ -17,8 +17,6 @@ fun setUpEnvironment() =
     Environment(
         raw = System.getenv(),
         stsSoapBaseUrl = System.getenv("STS_BASE_SOAP_URL"),
-        egenAnsattBaseUrl = System.getenv("EGENANSATT_URL")
-            ?: error("Mangler env var EGENANSATT_URL"),
         organisasjonBaseUrl = System.getenv("ORGANISASJON_BASE_URL")
             ?: error("Mangler env var ORGANISASJON_BASE_URL"),
         kodeverkBaseUrl = System.getenv("KODEVERK_BASE_URL")
@@ -32,7 +30,6 @@ data class Environment(
     val raw: Map<String, String>,
     val stsBaseUrl: String = "http://security-token-service.default.svc.nais.local",
     val stsSoapBaseUrl: String,
-    val egenAnsattBaseUrl: String,
     val organisasjonBaseUrl: String,
     val kodeverkBaseUrl: String,
     val aaregBaseUrl: String,
