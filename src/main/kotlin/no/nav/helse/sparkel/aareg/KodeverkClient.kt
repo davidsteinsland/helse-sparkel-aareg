@@ -28,7 +28,9 @@ class KodeverkClient(
                 }
                     .receive<String>()
         }
-        requireNotNull(objectMapper.readTree(cachedNæringResponse).hentTekst(kode))
+        val responseTree = objectMapper.readTree(cachedNæringResponse)
+        println("cachedNæringResponse: $cachedNæringResponse \nresponseTree: $responseTree")
+        requireNotNull(responseTree.hentTekst(kode))
     }
 
     fun getYrke(kode: String) = runBlocking {
