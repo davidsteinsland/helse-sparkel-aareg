@@ -32,8 +32,8 @@ class ArbeidsforholdClient(
             .flatMap { it.arbeidsavtale }
             .map {
                 ArbeidsforholdDto(
-                    startdato = it.fomGyldighetsperiode.toLocalDate(),
-                    sluttdato = it.tomGyldighetsperiode.toLocalDate(),
+                    startdato = it.fomBruksperiode.toLocalDate(),
+                    sluttdato = it.tomBruksperiode?.toLocalDate(),
                     stillingsprosent = it.stillingsprosent.toInt(),
                     stillingstittel = kodeverkClient.getYrke(it.yrke.kodeverksRef),
                 )
