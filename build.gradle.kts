@@ -39,6 +39,8 @@ dependencies {
     implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
     implementation("javax.activation:activation:1.1.1")
 
+    testImplementation("io.ktor:ktor-client-mock-jvm:$ktorVersion")
+
     testImplementation("io.mockk:mockk:1.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")

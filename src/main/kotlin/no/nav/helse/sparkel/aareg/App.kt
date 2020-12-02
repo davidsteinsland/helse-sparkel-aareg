@@ -57,7 +57,11 @@ internal fun createApp(environment: Environment, serviceUser: ServiceUser): Rapi
     val httpClient = HttpClient {
         install(JsonFeature) { serializer = JacksonSerializer() }
     }
-    val kodeverkClient = KodeverkClient(httpClient, environment)
+    val kodeverkClient = KodeverkClient(
+        httpClient = httpClient,
+        kodeverkBaseUrl = environment.kodeverkBaseUrl,
+        appName = environment.appName
+    )
 
     val arbeidsforholdClient = ArbeidsforholdClient(arbeidsforholdV3, kodeverkClient)
     val organisasjonClient = OrganisasjonClient(organisasjonV5, kodeverkClient)

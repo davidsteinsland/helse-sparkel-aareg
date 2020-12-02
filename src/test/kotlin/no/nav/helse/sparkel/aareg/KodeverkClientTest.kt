@@ -1,33 +1,59 @@
 package no.nav.helse.sparkel.aareg
 
-import com.fasterxml.jackson.databind.JsonNode
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondBadRequest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
+private const val kodeverkverdi = "Engroshandel med innsatsvarer ikke nevnt annet sted"
+private const val kodeverkRef = "46.769"
+
 internal class KodeverkClientTest {
+
     @Test
     fun `henter tekst fra kodeverksrespons`() {
-        assertEquals("Engroshandel med innsatsvarer ikke nevnt annet sted", kodeverksrespons.hentTekst("46.769"))
+        assertEquals(kodeverkverdi, requireNotNull(objectMapper.readTree(næringRespons)).hentTekst(kodeverkRef))
     }
 
-    private val kodeverksrespons: JsonNode = requireNotNull(
-        objectMapper.valueToTree(
-            mapOf(
-                "betydninger" to mapOf(
-                    "46.769" to listOf(
-                        mapOf(
-                            "gyldigFra" to "1995-01-01",
-                            "gyldigTil" to "9999-12-31",
-                            "beskrivelser" to mapOf(
-                                "nb" to mapOf(
-                                    "term" to "Engroshandel med innsatsvarer ikke nevnt annet sted",
-                                    "tekst" to "Engroshandel med innsatsvarer ikke nevnt annet sted"
-                                )
-                            )
-                        )
-                    )
-                )
-            )
+    @Test
+    fun `henter næring`() {
+        val httpClient = HttpClient(MockEngine) {
+            engine {
+                addHandler { request ->
+                    when (request.url.encodedPath) {
+                        "/api/v1/kodeverk/N%C3%A6ringskoder/koder/betydninger" -> respond(næringRespons)
+                        else -> respondBadRequest()
+                    }
+                }
+            }
+        }
+        val kodeverkClient = KodeverkClient(
+            httpClient = httpClient,
+            kodeverkBaseUrl = "http://base.url",
+            appName = "sparkel-aareg"
         )
-    )
+
+        kodeverkClient.getNæring(kodeverkRef)
+    }
+
+    private val næringRespons = """
+            {
+              "betydninger": {
+                "$kodeverkRef": [
+                  {
+                    "gyldigFra": "1995-01-01",
+                    "gyldigTil": "9999-12-31",
+                    "beskrivelser": {
+                      "nb": {
+                        "term": "$kodeverkverdi",
+                        "tekst": "$kodeverkverdi"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+        """
 }
