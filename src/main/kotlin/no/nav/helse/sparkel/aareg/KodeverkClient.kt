@@ -29,7 +29,6 @@ class KodeverkClient(
                     .receive<String>()
         }
         val responseTree = objectMapper.readTree(cachedNæringResponse)
-        println("cachedNæringResponse: $cachedNæringResponse \nresponseTree: $responseTree")
         requireNotNull(responseTree.hentTekst(kode))
     }
 
@@ -50,8 +49,9 @@ class KodeverkClient(
         parameter("ekskluderUgyldige", true)
         parameter("oppslagsdato", LocalDate.now())
     }
-
 }
 
-fun JsonNode.hentTekst(kode: String): String? =
-    path("betydninger").path(kode)[0].path("beskrivelser").path("nb").path("tekst").asText()
+fun JsonNode.hentTekst(kode: String): String =
+    requireNotNull(path("betydninger").path(kode).takeIf { !it.isMissingNode }
+        ?.first()) { "Mangler betydninger for $kode" }
+        .path("beskrivelser").path("nb").path("tekst").asText()
