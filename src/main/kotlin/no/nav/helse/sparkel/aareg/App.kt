@@ -86,7 +86,13 @@ internal fun createApp(environment: Environment, serviceUser: ServiceUser): Rapi
         routing {
             get("/api/test") {
                 val behov = call.receive<Behov>()
-                call.respond(behovløser.løsBehov(behov.aktørId, behov.fom, behov.tom, behov.organisasjonsnummer))
+                val message = behovløser.løsBehov(
+                    aktørId = behov.aktørId,
+                    fom = behov.fom,
+                    tom = behov.tom,
+                    organisasjonsnummer = behov.organisasjonsnummer
+                )
+                call.respond(message)
             }
         }
     }.build()

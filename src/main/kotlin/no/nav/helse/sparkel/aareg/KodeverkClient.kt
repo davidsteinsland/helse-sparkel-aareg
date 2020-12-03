@@ -1,7 +1,6 @@
 package no.nav.helse.sparkel.aareg
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import io.ktor.client.HttpClient
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
@@ -28,8 +27,7 @@ class KodeverkClient(
                 }
                     .receive<String>()
         }
-        val responseTree = objectMapper.readTree(cachedNæringResponse)
-        requireNotNull(responseTree.hentTekst(kode))
+        requireNotNull(objectMapper.readTree(cachedNæringResponse).hentTekst(kode))
     }
 
     fun getYrke(kode: String) = runBlocking {
@@ -37,7 +35,8 @@ class KodeverkClient(
             cachedYrkerResponse =
                 httpClient.get<HttpStatement>("$kodeverkBaseUrl/api/v1/kodeverk/Yrker/koder/betydninger") {
                     setup(UUID.randomUUID().toString())
-                }.receive<ObjectNode>().hentTekst(kode)
+                }
+                    .receive<String>()
         }
         requireNotNull(objectMapper.readTree(cachedYrkerResponse).hentTekst(kode))
     }
