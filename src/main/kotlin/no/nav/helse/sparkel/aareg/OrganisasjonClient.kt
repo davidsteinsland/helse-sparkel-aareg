@@ -13,7 +13,8 @@ class OrganisasjonClient(
             OrganisasjonDto(
                 navn = (organisasjon.navn as UstrukturertNavn).navnelinje.joinToString(),
                 bransjer = organisasjon.organisasjonDetaljer.naering.map { næring ->
-                    kodeverkClient.getNæring(næring.naeringskode.kodeverksRef)
+                    kodeverkClient.getNæring(næring.naeringskode.kodeRef)
+                        .also { println("Kanskje naering: ${næring.naeringskode.value}") }
                 }
             )
         }
