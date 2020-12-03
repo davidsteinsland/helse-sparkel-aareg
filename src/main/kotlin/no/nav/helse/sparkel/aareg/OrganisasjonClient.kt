@@ -11,10 +11,9 @@ class OrganisasjonClient(
     fun finnOrganisasjon(orgnr: String): OrganisasjonDto =
         organisasjonV5.hentOrganisasjon(hentOrganisasjonRequst(orgnr)).organisasjon.let { organisasjon ->
             OrganisasjonDto(
-                navn = (organisasjon.navn as UstrukturertNavn).navnelinje.joinToString(),
+                navn = (organisasjon.navn as UstrukturertNavn).navnelinje.filter { it.isNotBlank() }.joinToString(),
                 bransjer = organisasjon.organisasjonDetaljer.naering.map { næring ->
                     kodeverkClient.getNæring(næring.naeringskode.kodeRef)
-                        .also { println("Kanskje naering: ${næring.naeringskode.value}") }
                 }
             )
         }

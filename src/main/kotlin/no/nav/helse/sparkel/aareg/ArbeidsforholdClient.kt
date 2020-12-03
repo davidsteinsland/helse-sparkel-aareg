@@ -31,7 +31,6 @@ class ArbeidsforholdClient(
             .filter { it.arbeidsgiver is Organisasjon && (it.arbeidsgiver as Organisasjon).orgnummer == organisasjonsnummer }
             .flatMap { it.arbeidsavtale }
             .map {
-                println("Kanskje yrke: ${it.yrke.value}")
                 ArbeidsforholdDto(
                     startdato = it.fomBruksperiode.toLocalDate(),
                     sluttdato = it.tomBruksperiode?.toLocalDate(),
