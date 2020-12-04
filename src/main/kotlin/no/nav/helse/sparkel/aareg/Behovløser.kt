@@ -9,7 +9,7 @@ import no.nav.helse.rapids_rivers.asLocalDate
 import java.time.LocalDate
 
 class Behovløser(
-    private val rapidsConnection: RapidsConnection,
+    rapidsConnection: RapidsConnection,
     private val arbeidsforholdClient: ArbeidsforholdClient,
     private val organisasjonClient: OrganisasjonClient
 ) : River.PacketListener {
@@ -56,7 +56,7 @@ class Behovløser(
         context.send(packet.toJson())
     }
 
-    internal fun løsBehov(
+    private fun løsBehov(
         aktørId: String,
         fom: LocalDate,
         tom: LocalDate,
