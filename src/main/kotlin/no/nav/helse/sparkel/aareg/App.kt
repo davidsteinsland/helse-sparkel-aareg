@@ -4,22 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.client.HttpClient
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.features.CallId
-import io.ktor.features.CallLogging
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.callIdMdc
-import io.ktor.http.ContentType
-import io.ktor.jackson.JacksonConverter
-import io.ktor.request.path
-import io.ktor.request.receive
-import io.ktor.response.respond
-import io.ktor.routing.get
-import io.ktor.routing.routing
+import io.ktor.client.*
+import io.ktor.client.features.json.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.binding.ArbeidsforholdV3
@@ -30,12 +16,10 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.apache.cxf.ws.security.trust.STSClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.event.Level
-import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 import javax.xml.namespace.QName
 
-val httpTraceLog: Logger = LoggerFactory.getLogger("tjenestekall")
+val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
 
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -66,41 +50,11 @@ internal fun createApp(environment: Environment, serviceUser: ServiceUser): Rapi
     val arbeidsforholdClient = ArbeidsforholdClient(arbeidsforholdV3, kodeverkClient)
     val organisasjonClient = OrganisasjonClient(organisasjonV5, kodeverkClient)
 
-    val behovløser = Behovløser(arbeidsforholdClient, organisasjonClient)
+    val rapidsConnection = RapidApplication.create(environment.raw)
+    Behovløser(rapidsConnection, arbeidsforholdClient, organisasjonClient)
 
-    return RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(environment.raw)).withKtorModule {
-        install(CallId) {
-            generate {
-                UUID.randomUUID().toString()
-            }
-        }
-        install(CallLogging) {
-            logger = httpTraceLog
-            level = Level.INFO
-            callIdMdc("callId")
-            filter { call -> call.request.path().startsWith("/api/") }
-        }
-        install(ContentNegotiation) {
-            register(ContentType.Application.Json, JacksonConverter(objectMapper))
-        }
-        routing {
-            get("/api/test") {
-                val behov = call.receive<Behov>()
-                val message = behovløser.løsBehov(
-                    aktørId = behov.aktørId,
-                    fom = behov.fom,
-                    tom = behov.tom,
-                    organisasjonsnummer = behov.organisasjonsnummer
-                )
-                call.respond(message)
-            }
-        }
-    }.build()
+    return rapidsConnection
 }
-
-data class Behov(
-    val aktørId: String, val fom: LocalDate, val tom: LocalDate, val organisasjonsnummer: String
-)
 
 private val callIdGenerator: ThreadLocal<String> = ThreadLocal.withInitial {
     UUID.randomUUID().toString()
