@@ -80,13 +80,13 @@ class Behovløser(
             nøkkel to data
         )
     }
-}
 
-data class LøsningDto(
-    val arbeidsgivernavn: String,
-    val bransjer: List<String>,
-    val stillingstittel: String,
-    val stillingsprosent: Int,
-    val startdato: LocalDate,
-    val sluttdato: LocalDate?
-)
+    data class LøsningDto(
+        val arbeidsgivernavn: String,
+        val bransjer: List<String>,
+        val stillingstittel: String,
+        val stillingsprosent: Int,
+        val startdato: LocalDate,
+        val sluttdato: LocalDate?
+    )
+}
