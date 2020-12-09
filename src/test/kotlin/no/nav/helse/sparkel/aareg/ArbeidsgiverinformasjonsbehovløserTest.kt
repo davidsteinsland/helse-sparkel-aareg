@@ -24,7 +24,6 @@ internal class ArbeidsgiverinformasjonsbehovløserTest {
         val melding = mapOf(
             "@behov" to listOf("Arbeidsgiverinformasjon"),
             "@id" to UUID.randomUUID(),
-            "vedtaksperiodeId" to UUID.randomUUID(),
             "organisasjonsnummer" to "organisasjonsnummer",
         )
         testRapid.sendTestMessage(objectMapper.writeValueAsString(melding))

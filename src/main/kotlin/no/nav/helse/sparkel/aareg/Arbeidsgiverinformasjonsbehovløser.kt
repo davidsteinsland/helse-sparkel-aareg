@@ -19,7 +19,6 @@ class Arbeidsgiverinformasjonsbehovløser(
             validate { it.requireContains("@behov", behov) }
             validate { it.forbid("@løsning") }
             validate { it.requireKey("@id") }
-            validate { it.requireKey("vedtaksperiodeId") }
             validate { it.requireKey("organisasjonsnummer") }
         }.register(this)
     }
@@ -32,9 +31,8 @@ class Arbeidsgiverinformasjonsbehovløser(
         løsBehov(organisasjonsnummer = organisasjonsnummer).also { packet.setLøsning(behov, it) }
 
         sikkerlogg.info(
-            "løser behov {} for {}",
+            "løser $behov-behov {}",
             keyValue("id", packet["@id"].asText()),
-            keyValue("vedtaksperiodeId", packet["vedtaksperiodeId"].asText())
         )
 
         context.send(packet.toJson())
