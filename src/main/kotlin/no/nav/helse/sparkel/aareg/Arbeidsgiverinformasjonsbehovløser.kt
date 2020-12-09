@@ -19,14 +19,14 @@ class Arbeidsgiverinformasjonsbehovløser(
             validate { it.requireContains("@behov", behov) }
             validate { it.forbid("@løsning") }
             validate { it.requireKey("@id") }
-            validate { it.requireKey("organisasjonsnummer") }
+            validate { it.requireKey("$behov.organisasjonsnummer") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         sikkerlogg.info("mottok melding: ${packet.toJson()}")
 
-        val organisasjonsnummer = packet["organisasjonsnummer"].asText()
+        val organisasjonsnummer = packet["$behov.organisasjonsnummer"].asText()
 
         løsBehov(organisasjonsnummer = organisasjonsnummer).also { packet.setLøsning(behov, it) }
 
