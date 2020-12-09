@@ -31,6 +31,6 @@ internal class ArbeidsgiverinformasjonsbehovløserTest {
 
         val løsning = testRapid.inspektør.message(testRapid.inspektør.size - 1).path("@løsning")
 
-        assertTrue(løsning.hasNonNull("Arbeidsgiverinformasjon")) { "Skal ha løsning for Arbeidsforhold" }
+        assertTrue(løsning.hasNonNull("Arbeidsgiverinformasjon")) { "Skal ha løsning for Arbeidsgiverinformasjon" }
     }
 }
