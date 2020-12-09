@@ -42,7 +42,7 @@ class Arbeidsgiverinformasjonsbehovløser(
         organisasjonClient.finnOrganisasjon(organisasjonsnummer)
             .let { organisasjon ->
                 LøsningDto(
-                    arbeidsgivernavn = organisasjon.navn,
+                    navn = organisasjon.navn,
                     bransjer = organisasjon.bransjer,
                 )
             }
@@ -54,7 +54,7 @@ class Arbeidsgiverinformasjonsbehovløser(
     }
 
     data class LøsningDto(
-        val arbeidsgivernavn: String,
+        val navn: String,
         val bransjer: List<String>
     )
 }
