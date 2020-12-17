@@ -8,6 +8,12 @@ import io.ktor.client.*
 import io.ktor.client.features.json.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.sparkel.aareg.arbeidsforhold.ArbeidsforholdClient
+import no.nav.helse.sparkel.aareg.arbeidsforhold.Behovløser
+import no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon.Arbeidsgiverinformasjonsbehovløser
+import no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon.OrganisasjonClient
+import no.nav.helse.sparkel.aareg.util.CallIdInterceptor
+import no.nav.helse.sparkel.aareg.util.KodeverkClient
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.binding.ArbeidsforholdV3
 import no.nav.tjeneste.virksomhet.organisasjon.v5.binding.OrganisasjonV5
 import org.apache.cxf.ext.logging.LoggingFeature

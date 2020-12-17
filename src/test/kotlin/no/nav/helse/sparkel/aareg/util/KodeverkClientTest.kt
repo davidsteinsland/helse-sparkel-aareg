@@ -1,9 +1,10 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.util
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondBadRequest
+import no.nav.helse.sparkel.aareg.objectMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

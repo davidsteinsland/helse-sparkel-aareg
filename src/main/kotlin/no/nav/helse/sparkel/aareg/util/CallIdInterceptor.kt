@@ -1,4 +1,4 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.util
 
 import org.apache.cxf.binding.soap.SoapHeader
 import org.apache.cxf.binding.soap.SoapMessage

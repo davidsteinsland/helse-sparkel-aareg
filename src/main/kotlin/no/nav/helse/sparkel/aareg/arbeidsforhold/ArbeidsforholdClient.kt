@@ -1,5 +1,6 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.arbeidsforhold
 
+import no.nav.helse.sparkel.aareg.util.KodeverkClient
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.binding.ArbeidsforholdV3
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.NorskIdent
 import no.nav.tjeneste.virksomhet.arbeidsforhold.v3.informasjon.arbeidsforhold.Organisasjon

@@ -1,5 +1,6 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon
 
+import no.nav.helse.sparkel.aareg.util.KodeverkClient
 import no.nav.tjeneste.virksomhet.organisasjon.v5.binding.OrganisasjonV5
 import no.nav.tjeneste.virksomhet.organisasjon.v5.informasjon.UstrukturertNavn
 import no.nav.tjeneste.virksomhet.organisasjon.v5.meldinger.HentOrganisasjonRequest

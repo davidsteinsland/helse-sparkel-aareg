@@ -1,8 +1,9 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon
 
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.helse.sparkel.aareg.objectMapper
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.UUID

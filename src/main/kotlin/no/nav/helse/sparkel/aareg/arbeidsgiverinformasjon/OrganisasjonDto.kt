@@ -1,4 +1,4 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon
 
 data class OrganisasjonDto(
     val navn: String,

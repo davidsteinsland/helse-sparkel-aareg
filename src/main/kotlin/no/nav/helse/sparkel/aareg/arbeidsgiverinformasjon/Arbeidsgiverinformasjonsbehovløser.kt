@@ -1,10 +1,10 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon
 
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDate
+import no.nav.helse.sparkel.aareg.sikkerlogg
 
 class Arbeidsgiverinformasjonsbehovløser(
     rapidsConnection: RapidsConnection,

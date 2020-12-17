@@ -1,7 +1,9 @@
-package no.nav.helse.sparkel.aareg
+package no.nav.helse.sparkel.aareg.util
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon.OrganisasjonClient
+import no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon.OrganisasjonDto
 import no.nav.tjeneste.virksomhet.organisasjon.v5.binding.OrganisasjonV5
 import no.nav.tjeneste.virksomhet.organisasjon.v5.informasjon.Naering
 import no.nav.tjeneste.virksomhet.organisasjon.v5.informasjon.Naeringskoder
