@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 
-internal class BehovløserTest {
+internal class ArbeidsforholdbehovløserTest {
     private val testRapid = TestRapid()
     private val arbeidsforholdClient = mockk<ArbeidsforholdClient>()
     private val organisasjonClient = mockk<OrganisasjonClient>()
 
     init {
-        Behovløser(testRapid, arbeidsforholdClient, organisasjonClient)
+        Arbeidsforholdbehovløser(testRapid, arbeidsforholdClient)
         every { organisasjonClient.finnOrganisasjon("organisasjonsnummer") } returns OrganisasjonDto(
             "BEDRIFT",
             listOf("BRANSJE")

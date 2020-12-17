@@ -6,14 +6,12 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
-import no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon.OrganisasjonClient
 import no.nav.helse.sparkel.aareg.sikkerlogg
 import java.time.LocalDate
 
-class Behovløser(
+class Arbeidsforholdbehovløser(
     rapidsConnection: RapidsConnection,
-    private val arbeidsforholdClient: ArbeidsforholdClient,
-    private val organisasjonClient: OrganisasjonClient
+    private val arbeidsforholdClient: ArbeidsforholdClient
 ) : River.PacketListener {
     companion object {
         internal const val behov = "Arbeidsforhold"
@@ -63,19 +61,20 @@ class Behovløser(
         fom: LocalDate,
         tom: LocalDate,
         organisasjonsnummer: String
-    ): List<LøsningDto> {
-        val organisasjon = organisasjonClient.finnOrganisasjon(organisasjonsnummer)
-        return arbeidsforholdClient.finnArbeidsforhold(organisasjonsnummer, aktørId, fom, tom).map { arbeidsforhold ->
+    ): List<LøsningDto> =
+        arbeidsforholdClient.finnArbeidsforhold(
+            organisasjonsnummer = organisasjonsnummer,
+            aktørId = aktørId,
+            fom = fom,
+            tom = tom
+        ).map { arbeidsforhold ->
             LøsningDto(
-                arbeidsgivernavn = organisasjon.navn,
-                bransjer = organisasjon.bransjer,
                 stillingstittel = arbeidsforhold.stillingstittel,
                 stillingsprosent = arbeidsforhold.stillingsprosent,
                 startdato = arbeidsforhold.startdato,
                 sluttdato = arbeidsforhold.sluttdato
             )
         }
-    }
 
     private fun JsonMessage.setLøsning(nøkkel: String, data: Any) {
         this["@løsning"] = mapOf(
@@ -84,8 +83,6 @@ class Behovløser(
     }
 
     data class LøsningDto(
-        val arbeidsgivernavn: String,
-        val bransjer: List<String>,
         val stillingstittel: String,
         val stillingsprosent: Int,
         val startdato: LocalDate,

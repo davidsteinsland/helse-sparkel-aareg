@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.client.*
-import io.ktor.client.features.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.sparkel.aareg.arbeidsforhold.ArbeidsforholdClient
-import no.nav.helse.sparkel.aareg.arbeidsforhold.Behovløser
+import no.nav.helse.sparkel.aareg.arbeidsforhold.Arbeidsforholdbehovløser
 import no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon.Arbeidsgiverinformasjonsbehovløser
 import no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon.OrganisasjonClient
 import no.nav.helse.sparkel.aareg.util.CallIdInterceptor
@@ -22,7 +23,7 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature
 import org.apache.cxf.ws.security.trust.STSClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.util.UUID
 import javax.xml.namespace.QName
 
 val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
@@ -58,7 +59,7 @@ internal fun createApp(environment: Environment, serviceUser: ServiceUser): Rapi
 
     val rapidsConnection = RapidApplication.create(environment.raw)
     Arbeidsgiverinformasjonsbehovløser(rapidsConnection, organisasjonClient)
-    Behovløser(rapidsConnection, arbeidsforholdClient, organisasjonClient)
+    Arbeidsforholdbehovløser(rapidsConnection, arbeidsforholdClient)
 
     return rapidsConnection
 }
