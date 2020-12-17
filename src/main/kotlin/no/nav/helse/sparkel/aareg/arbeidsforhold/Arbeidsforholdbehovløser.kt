@@ -24,19 +24,19 @@ class Arbeidsforholdbehovløser(
             validate { it.requireKey("@id") }
             validate { it.requireKey("aktørId") }
             validate { it.requireKey("vedtaksperiodeId") }
-            validate { it.requireKey("organisasjonsnummer") }
-            validate { it.require("fom", JsonNode::asLocalDate) }
-            validate { it.require("tom", JsonNode::asLocalDate) }
+            validate { it.requireKey("$behov.organisasjonsnummer") }
+            validate { it.require("$behov.fom", JsonNode::asLocalDate) }
+            validate { it.require("$behov.tom", JsonNode::asLocalDate) }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         sikkerlogg.info("mottok melding: ${packet.toJson()}")
 
-        val organisasjonsnummer = packet["organisasjonsnummer"].asText()
+        val organisasjonsnummer = packet["$behov.organisasjonsnummer"].asText()
         val aktørId = packet["aktørId"].asText()
-        val fom = packet["fom"].asLocalDate()
-        val tom = packet["tom"].asLocalDate()
+        val fom = packet["$behov.fom"].asLocalDate()
+        val tom = packet["$behov.tom"].asLocalDate()
 
         løsBehov(
             aktørId = aktørId,
