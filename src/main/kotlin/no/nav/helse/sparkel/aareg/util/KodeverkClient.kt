@@ -20,7 +20,7 @@ class KodeverkClient(
     private var cachedNæringResponse: String? = null
     private var cachedYrkerResponse: String? = null
 
-    fun getNæring(kode: String): String = runBlocking {
+    fun getNæring(kode: String): String = requireNotNull(objectMapper.readTree(runBlocking {
         if (cachedNæringResponse === null) {
             cachedNæringResponse =
                 httpClient.get<HttpStatement>("$kodeverkBaseUrl/api/v1/kodeverk/Næringskoder/koder/betydninger") {
@@ -28,10 +28,10 @@ class KodeverkClient(
                 }
                     .receive<String>()
         }
-        requireNotNull(objectMapper.readTree(cachedNæringResponse).hentTekst(kode))
-    }
+        cachedNæringResponse
+    }).hentTekst(kode))
 
-    fun getYrke(kode: String) = runBlocking {
+    fun getYrke(kode: String) = requireNotNull(objectMapper.readTree(runBlocking {
         if (cachedYrkerResponse === null) {
             cachedYrkerResponse =
                 httpClient.get<HttpStatement>("$kodeverkBaseUrl/api/v1/kodeverk/Yrker/koder/betydninger") {
@@ -39,8 +39,9 @@ class KodeverkClient(
                 }
                     .receive<String>()
         }
-        requireNotNull(objectMapper.readTree(cachedYrkerResponse).hentTekst(kode))
-    }
+        cachedYrkerResponse
+    }).hentTekst(kode))
+
 
     private fun HttpRequestBuilder.setup(callId: String) {
         header("Nav-Call-Id", callId)
