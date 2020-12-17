@@ -22,8 +22,8 @@ class Arbeidsforholdbehovløser(
             validate { it.requireContains("@behov", behov) }
             validate { it.forbid("@løsning") }
             validate { it.requireKey("@id") }
-            validate { it.requireKey("aktørId") }
             validate { it.requireKey("vedtaksperiodeId") }
+            validate { it.requireKey("$behov.aktørId") }
             validate { it.requireKey("$behov.organisasjonsnummer") }
             validate { it.require("$behov.fom", JsonNode::asLocalDate) }
             validate { it.require("$behov.tom", JsonNode::asLocalDate) }
@@ -34,7 +34,7 @@ class Arbeidsforholdbehovløser(
         sikkerlogg.info("mottok melding: ${packet.toJson()}")
 
         val organisasjonsnummer = packet["$behov.organisasjonsnummer"].asText()
-        val aktørId = packet["aktørId"].asText()
+        val aktørId = packet["$behov.aktørId"].asText()
         val fom = packet["$behov.fom"].asLocalDate()
         val tom = packet["$behov.tom"].asLocalDate()
 

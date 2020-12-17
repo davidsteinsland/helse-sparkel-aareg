@@ -43,13 +43,13 @@ internal class ArbeidsforholdbehovløserTest {
         val melding = mapOf(
             "@behov" to listOf("Arbeidsforhold"),
             "@id" to UUID.randomUUID(),
-            "aktørId" to "aktørId",
             "vedtaksperiodeId" to "vedtaksperiodeId",
             "Arbeidsforhold" to mapOf(
                 "organisasjonsnummer" to "organisasjonsnummer",
+                "aktørId" to "aktørId",
                 "fom" to "2020-01-01",
                 "tom" to "2020-02-01"
-            )
+            ),
         )
         testRapid.sendTestMessage(objectMapper.writeValueAsString(melding))
 
