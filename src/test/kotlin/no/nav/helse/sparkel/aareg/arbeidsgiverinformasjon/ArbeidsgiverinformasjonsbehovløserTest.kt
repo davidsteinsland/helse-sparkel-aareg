@@ -25,8 +25,11 @@ internal class ArbeidsgiverinformasjonsbehovløserTest {
         val melding = mapOf(
             "@behov" to listOf("Arbeidsgiverinformasjon"),
             "@id" to UUID.randomUUID(),
-            "Arbeidsgiverinformasjon" to mapOf("organisasjonsnummer" to "organisasjonsnummer"),
+            "Arbeidsgiverinformasjon" to mapOf(
+                "organisasjonsnummer" to "organisasjonsnummer"
+            ),
         )
+
         testRapid.sendTestMessage(objectMapper.writeValueAsString(melding))
 
         val løsning = testRapid.inspektør.message(testRapid.inspektør.size - 1).path("@løsning")

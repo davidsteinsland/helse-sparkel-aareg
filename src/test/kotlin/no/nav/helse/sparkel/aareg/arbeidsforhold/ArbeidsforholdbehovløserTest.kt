@@ -43,7 +43,6 @@ internal class ArbeidsforholdbehovløserTest {
         val melding = mapOf(
             "@behov" to listOf("Arbeidsforhold"),
             "@id" to UUID.randomUUID(),
-            "vedtaksperiodeId" to "vedtaksperiodeId",
             "Arbeidsforhold" to mapOf(
                 "organisasjonsnummer" to "organisasjonsnummer",
                 "aktørId" to "aktørId",
