@@ -75,7 +75,7 @@ fun setupOrganisasjonV5(organisasjonBaseUrl: String, stsClientWs: STSClient): Or
         serviceName = QName("http://nav.no/tjeneste/virksomhet/organisasjon/v5/Binding", "Organisasjon_v5")
         endpointName = QName("http://nav.no/tjeneste/virksomhet/organisasjon/v5/Binding", "Organisasjon_v5Port")
         serviceClass = OrganisasjonV5::class.java
-        this.features.addAll(listOf(WSAddressingFeature(), LoggingFeature()))
+        this.features.addAll(listOf(WSAddressingFeature()))
         this.outInterceptors.addAll(listOf(CallIdInterceptor(callIdGenerator::get)))
     }.create(OrganisasjonV5::class.java).apply { stsClientWs.configureFor(this) }
 
@@ -86,6 +86,6 @@ fun setupArbeidsforholdV3(arbeidsforholdBaseUrl: String, stsClientWs: STSClient)
         serviceName = QName("http://nav.no/tjeneste/virksomhet/arbeidsforhold/v3/Binding", "Arbeidsforhold_v3")
         endpointName = QName("http://nav.no/tjeneste/virksomhet/arbeidsforhold/v3/Binding", "Arbeidsforhold_v3Port")
         serviceClass = ArbeidsforholdV3::class.java
-        this.features.addAll(listOf(WSAddressingFeature(), LoggingFeature()))
+        this.features.addAll(listOf(WSAddressingFeature()))
         this.outInterceptors.addAll(listOf(CallIdInterceptor(callIdGenerator::get)))
     }.create(ArbeidsforholdV3::class.java).apply { stsClientWs.configureFor(this) }
