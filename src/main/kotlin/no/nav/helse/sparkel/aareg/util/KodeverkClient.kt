@@ -9,8 +9,11 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpStatement
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.sparkel.aareg.objectMapper
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.util.UUID
+
+private val log = LoggerFactory.getLogger("sparkel-aareg")
 
 class KodeverkClient(
     private val httpClient: HttpClient,
@@ -53,6 +56,11 @@ class KodeverkClient(
 }
 
 fun JsonNode.hentTekst(kode: String): String =
-    requireNotNull(path("betydninger").path(kode).takeIf { !it.isMissingNode }
-        ?.first()) { "Mangler betydninger for $kode" }
-        .path("beskrivelser").path("nb").path("tekst").asText()
+    path("betydninger").path(kode).takeIf { !it.isMissingNode }
+        ?.first()
+        ?.path("beskrivelser")?.path("nb")?.path("tekst")?.asText()
+        ?: let {
+            log.warn("Mangler betydning for næringskode $kode")
+            "Ukjent"
+        }
+
