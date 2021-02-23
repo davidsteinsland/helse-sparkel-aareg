@@ -35,6 +35,9 @@ spec:
     enabled: true
   vault:
     enabled: true
+    paths:
+    - mountPath: /var/run/secrets/nais.io/service_user
+      kvPath: /serviceuser/data/dev/srvsparkelaareg
   env:
   - name: KAFKA_CONSUMER_GROUP_ID
     value: tbd-sparkel-aareg-v1
