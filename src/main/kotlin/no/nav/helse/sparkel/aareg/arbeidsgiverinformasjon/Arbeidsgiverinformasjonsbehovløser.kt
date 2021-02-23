@@ -2,6 +2,7 @@ package no.nav.helse.sparkel.aareg.arbeidsgiverinformasjon
 
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.sparkel.aareg.sikkerlogg
@@ -23,7 +24,7 @@ class Arbeidsgiverinformasjonsbehovløser(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
         sikkerlogg.info("mottok melding: ${packet.toJson()}")
 
         val organisasjonsnummer = packet["$behov.organisasjonsnummer"].asText()
@@ -35,7 +36,7 @@ class Arbeidsgiverinformasjonsbehovløser(
             keyValue("id", packet["@id"].asText()),
         )
 
-        context.send(packet.toJson())
+        context.publish(packet.toJson())
     }
 
     private fun løsBehov(organisasjonsnummer: String) =

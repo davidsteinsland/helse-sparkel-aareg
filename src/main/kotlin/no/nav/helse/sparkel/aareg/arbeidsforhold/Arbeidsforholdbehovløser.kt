@@ -3,6 +3,7 @@ package no.nav.helse.sparkel.aareg.arbeidsforhold
 import com.fasterxml.jackson.databind.JsonNode
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
@@ -29,7 +30,7 @@ class Arbeidsforholdbehovløser(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
         sikkerlogg.info("mottok melding: ${packet.toJson()}")
 
         val organisasjonsnummer = packet["$behov.organisasjonsnummer"].asText()
@@ -52,7 +53,7 @@ class Arbeidsforholdbehovløser(
             keyValue("løsning", packet["@løsning"])
         )
 
-        context.send(packet.toJson())
+        context.publish(packet.toJson())
     }
 
     private fun løsBehov(

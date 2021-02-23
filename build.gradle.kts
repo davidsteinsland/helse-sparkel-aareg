@@ -1,15 +1,9 @@
 val cxfVersion = "3.3.7"
 val junitJupiterVersion = "5.6.2"
-val ktorVersion = "1.4.2"
+val ktorVersion = "1.5.0"
 
 plugins {
-    kotlin("jvm") version "1.4.0"
-}
-
-buildscript {
-    dependencies {
-        classpath("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
-    }
+    kotlin("jvm") version "1.4.30"
 }
 
 repositories {
@@ -27,7 +21,7 @@ dependencies {
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
 
-    implementation("com.github.navikt:rapids-and-rivers:9ea2f5e")
+    implementation("com.github.navikt:rapids-and-rivers:1.5e3ca6a")
 
     implementation("no.nav.tjenestespesifikasjoner:arbeidsforholdv3-tjenestespesifikasjon:1.2019.01.16-21.19-afc54bed6f85")
     implementation("no.nav.tjenestespesifikasjoner:nav-fim-organisasjon-v5-tjenestespesifikasjon:1.2019.01.16-21.19-afc54bed6f85")
@@ -83,6 +77,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.7"
+        gradleVersion = "6.8.3"
     }
 }
